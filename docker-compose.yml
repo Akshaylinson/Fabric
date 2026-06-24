@@ -1,0 +1,162 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  gateway:
+    build: ./gateway
+    env_file: .env
+    environment:
+      PORT: ${GATEWAY_PORT}
+      AUTH_SERVICE_URL: http://auth-service:${AUTH_SERVICE_PORT}
+      BUSINESS_SERVICE_URL: http://business-service:${BUSINESS_SERVICE_PORT}
+      ORCHESTRATOR_SERVICE_URL: http://orchestrator-service:${ORCHESTRATOR_SERVICE_PORT}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  auth-service:
+    build: ./auth-service
+    env_file: .env
+    environment:
+      PORT: ${AUTH_SERVICE_PORT}
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
+      REDIS_URL: ${REDIS_URL}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  business-service:
+    build: ./business-service
+    env_file: .env
+    environment:
+      PORT: ${BUSINESS_SERVICE_PORT}
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+    ports:
+      - "3002:3002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+
+  orchestrator-service:
+    build: ./orchestrator-service
+    env_file: .env
+    environment:
+      PORT: ${ORCHESTRATOR_SERVICE_PORT}
+      REDIS_URL: ${REDIS_URL}
+      TEMPLATE_SERVICE_URL: http://template-service:${TEMPLATE_SERVICE_PORT}
+      FABRIC_SERVICE_URL: http://fabric-service:${FABRIC_SERVICE_PORT}
+      TRYON_SERVICE_URL: http://tryon-service:${TRYON_SERVICE_PORT}
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  template-service:
+    build: ./template-service
+    env_file: .env
+    environment:
+      PORT: ${TEMPLATE_SERVICE_PORT}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      REDIS_URL: ${REDIS_URL}
+    ports:
+      - "8001:8001"
+    depends_on:
+      minio:
+        condition: service_started
+      redis:
+        condition: service_healthy
+
+  fabric-service:
+    build: ./fabric-service
+    env_file: .env
+    environment:
+      PORT: ${FABRIC_SERVICE_PORT}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+    ports:
+      - "8002:8002"
+    depends_on:
+      minio:
+        condition: service_started
+
+  tryon-service:
+    build: ./tryon-service
+    env_file: .env
+    environment:
+      PORT: ${TRYON_SERVICE_PORT}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+    ports:
+      - "8003:8003"
+    depends_on:
+      minio:
+        condition: service_started
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - gateway
+      - auth-service
+      - business-service
+      - orchestrator-service
+      - template-service
+      - fabric-service
+      - tryon-service
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+

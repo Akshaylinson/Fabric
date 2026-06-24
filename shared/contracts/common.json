@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Common Job Status",
+  "type": "object",
+  "properties": {
+    "job_id": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["queued", "processing", "succeeded", "failed"]
+    },
+    "message": { "type": "string" }
+  },
+  "required": ["job_id", "status"]
+}
+
