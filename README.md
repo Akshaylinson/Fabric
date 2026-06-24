@@ -11,6 +11,7 @@ Production-grade monorepo scaffold for an AI-powered textile visualization platf
 - `template-service`: FastAPI garment template creation
 - `fabric-service`: FastAPI fabric mapping and rendering
 - `tryon-service`: FastAPI virtual try-on rendering
+- `admin-dashboard`: Next.js internal admin and QA dashboard
 
 ## Run
 
@@ -27,6 +28,7 @@ docker compose up --build
 - Template: `http://localhost:8001`
 - Fabric: `http://localhost:8002`
 - Try-on: `http://localhost:8003`
+- Admin dashboard: `http://localhost:3005`
 - MinIO console: `http://localhost:9001`
 - Prometheus: `http://localhost:9090`
 

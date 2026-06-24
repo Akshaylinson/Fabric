@@ -140,6 +140,27 @@ services:
       minio:
         condition: service_started
 
+  admin-dashboard:
+    build: ./admin-dashboard
+    env_file: .env
+    environment:
+      NEXT_PUBLIC_GATEWAY_URL: http://gateway:${GATEWAY_PORT}
+      NEXT_PUBLIC_AUTH_URL: http://auth-service:${AUTH_SERVICE_PORT}
+      NEXT_PUBLIC_BUSINESS_URL: http://business-service:${BUSINESS_SERVICE_PORT}
+      NEXT_PUBLIC_ORCHESTRATOR_URL: http://orchestrator-service:${ORCHESTRATOR_SERVICE_PORT}
+      NEXT_PUBLIC_TEMPLATE_URL: http://template-service:${TEMPLATE_SERVICE_PORT}
+      NEXT_PUBLIC_FABRIC_URL: http://fabric-service:${FABRIC_SERVICE_PORT}
+      NEXT_PUBLIC_TRYON_URL: http://tryon-service:${TRYON_SERVICE_PORT}
+    ports:
+      - "3005:3005"
+    depends_on:
+      - gateway
+      - auth-service
+      - business-service
+      - orchestrator-service
+      - template-service
+      - fabric-service
+      - tryon-service
   prometheus:
     image: prom/prometheus:latest
     volumes:
