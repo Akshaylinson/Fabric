@@ -1,0 +1,217 @@
+{
+  "comparison": null,
+  "fabric_ref": "download (2).jpg",
+  "fabric_source_ref": "file:///data/objects/fabric-service/fabrics/download%20%282%29.jpg/source/fabric.jpg",
+  "job_id": "job_6188977d0735",
+  "metadata": {
+    "fabric_color": "#9fcfec",
+    "fabric_fit": "applied",
+    "garment_area_covered": "98.6%",
+    "preserved_structure": true,
+    "texture_strategy": "svg_full_bleed_shirt"
+  },
+  "notes": "Mock fabric transfer preserved garment structure and replaced only appearance.",
+  "processing_logs": [
+    {
+      "message": "Received render request for tpl_5861bf672b6c using download (2).jpg.",
+      "stage": "render-request",
+      "timestamp": "2026-06-25T12:10:38.234827+00:00"
+    },
+    {
+      "message": "Template tpl_5861bf672b6c loaded from the template service.",
+      "stage": "template-load",
+      "timestamp": "2026-06-25T12:10:38.234827+00:00"
+    },
+    {
+      "message": "Texture mapped using fabric color #9fcfec.",
+      "stage": "texture-mapping",
+      "timestamp": "2026-06-25T12:10:38.234827+00:00"
+    },
+    {
+      "message": "Render rnd_a1d8f0a0be36 completed in 98.17 ms.",
+      "stage": "render-complete",
+      "timestamp": "2026-06-25T12:10:38.333002+00:00"
+    }
+  ],
+  "render_id": "rnd_a1d8f0a0be36",
+  "render_label": "Workflow 2 - Fabric Render",
+  "rendered_image_ref": "file:///data/objects/fabric-service/renders/rnd_a1d8f0a0be36/rendered.svg",
+  "status": "completed",
+  "template_ref": "tpl_5861bf672b6c",
+  "template_snapshot": {
+    "analysis_history": [
+      {
+        "event": "created",
+        "processing_logs": [
+          {
+            "message": "Template Analysis received for tpl_5861bf672b6c.",
+            "stage": "ingestion",
+            "timestamp": "2026-06-25T10:23:12.769008+00:00"
+          },
+          {
+            "message": "Segmentation adapter generated masks for analysis version 1.",
+            "stage": "segmentation",
+            "timestamp": "2026-06-25T10:23:12.769008+00:00"
+          },
+          {
+            "message": "Metadata adapter extracted garment attributes and style notes.",
+            "stage": "metadata",
+            "timestamp": "2026-06-25T10:23:12.769008+00:00"
+          },
+          {
+            "message": "Embedding adapter produced the reusable template vector.",
+            "stage": "embedding",
+            "timestamp": "2026-06-25T10:23:12.769008+00:00"
+          }
+        ],
+        "timestamp": "2026-06-25T10:23:12.768894+00:00",
+        "version": 1
+      }
+    ],
+    "analysis_version": 1,
+    "created_at": "2026-06-25T10:23:12.768894+00:00",
+    "creator": {
+      "id": "designer_042",
+      "name": "Akshay"
+    },
+    "description": "Mock garment description generated from uploaded design images.",
+    "embedding_vector": [
+      0.12,
+      0.34,
+      0.56,
+      0.78
+    ],
+    "job_id": "job_d0c543679f3a",
+    "metadata": {
+      "collar_type": "spread",
+      "description": "Mock garment description generated from uploaded design images.",
+      "fit_type": "regular",
+      "garment_type": "shirt",
+      "length": "hip",
+      "sleeve_type": "long",
+      "source_image_count": 3
+    },
+    "preview_image": "file:///data/objects/template-service/templates/tpl_5861bf672b6c/preview/preview.png",
+    "processing_logs": [
+      {
+        "message": "Template Analysis received for tpl_5861bf672b6c.",
+        "stage": "ingestion",
+        "timestamp": "2026-06-25T10:23:12.769008+00:00"
+      },
+      {
+        "message": "Segmentation adapter generated masks for analysis version 1.",
+        "stage": "segmentation",
+        "timestamp": "2026-06-25T10:23:12.769008+00:00"
+      },
+      {
+        "message": "Metadata adapter extracted garment attributes and style notes.",
+        "stage": "metadata",
+        "timestamp": "2026-06-25T10:23:12.769008+00:00"
+      },
+      {
+        "message": "Embedding adapter produced the reusable template vector.",
+        "stage": "embedding",
+        "timestamp": "2026-06-25T10:23:12.769008+00:00"
+      }
+    ],
+    "segmentation_masks": [
+      "file:///data/objects/template-service/templates/tpl_5861bf672b6c/masks/front.json",
+      "file:///data/objects/template-service/templates/tpl_5861bf672b6c/masks/back.json",
+      "file:///data/objects/template-service/templates/tpl_5861bf672b6c/masks/side.json"
+    ],
+    "source_image_refs": [
+      "Screenshot 2026-06-25 140422.png",
+      "Screenshot 2026-06-25 140453.png",
+      "Screenshot 2026-06-25 140515.png"
+    ],
+    "source_images": {
+      "back": {
+        "ref": "Screenshot 2026-06-25 140453.png",
+        "storage_uri": "file:///data/objects/template-service/templates/tpl_5861bf672b6c/source/back.png"
+      },
+      "front": {
+        "ref": "Screenshot 2026-06-25 140422.png",
+        "storage_uri": "file:///data/objects/template-service/templates/tpl_5861bf672b6c/source/front.png"
+      },
+      "side": {
+        "ref": "Screenshot 2026-06-25 140515.png",
+        "storage_uri": "file:///data/objects/template-service/templates/tpl_5861bf672b6c/source/side.png"
+      }
+    },
+    "storage": {
+      "mask_files": [
+        "file:///data/objects/template-service/templates/tpl_5861bf672b6c/masks/front.json",
+        "file:///data/objects/template-service/templates/tpl_5861bf672b6c/masks/back.json",
+        "file:///data/objects/template-service/templates/tpl_5861bf672b6c/masks/side.json"
+      ],
+      "preview_image": "file:///data/objects/template-service/templates/tpl_5861bf672b6c/preview/preview.png"
+    },
+    "template_id": "tpl_5861bf672b6c",
+    "template_name": "Korean Shell Line",
+    "template_package": {
+      "analysis_version": 1,
+      "created_at": "2026-06-25T10:23:12.768894+00:00",
+      "creator": {
+        "id": "designer_042",
+        "name": "Akshay"
+      },
+      "description": "Mock garment description generated from uploaded design images.",
+      "embedding_vector": [
+        0.12,
+        0.34,
+        0.56,
+        0.78
+      ],
+      "metadata": {
+        "collar_type": "spread",
+        "description": "Mock garment description generated from uploaded design images.",
+        "fit_type": "regular",
+        "garment_type": "shirt",
+        "length": "hip",
+        "sleeve_type": "long",
+        "source_image_count": 3
+      },
+      "preview_image": "file:///data/objects/template-service/templates/tpl_5861bf672b6c/preview/preview.png",
+      "segmentation_masks": [
+        "file:///data/objects/template-service/templates/tpl_5861bf672b6c/masks/front.json",
+        "file:///data/objects/template-service/templates/tpl_5861bf672b6c/masks/back.json",
+        "file:///data/objects/template-service/templates/tpl_5861bf672b6c/masks/side.json"
+      ],
+      "source_image_refs": [
+        "Screenshot 2026-06-25 140422.png",
+        "Screenshot 2026-06-25 140453.png",
+        "Screenshot 2026-06-25 140515.png"
+      ],
+      "storage": {
+        "mask_files": [
+          "file:///data/objects/template-service/templates/tpl_5861bf672b6c/masks/front.json",
+          "file:///data/objects/template-service/templates/tpl_5861bf672b6c/masks/back.json",
+          "file:///data/objects/template-service/templates/tpl_5861bf672b6c/masks/side.json"
+        ],
+        "preview_image": "file:///data/objects/template-service/templates/tpl_5861bf672b6c/preview/preview.png"
+      },
+      "template_id": "tpl_5861bf672b6c",
+      "template_name": "Korean Shell Line",
+      "updated_at": "2026-06-25T10:23:12.768894+00:00"
+    },
+    "updated_at": "2026-06-25T10:23:12.768894+00:00"
+  },
+  "timing": {
+    "completed_at": "2026-06-25T12:10:38.333002+00:00",
+    "processing_time_ms": 98.17,
+    "started_at": "2026-06-25T12:10:38.234827+00:00"
+  },
+  "version_history": [
+    {
+      "label": "Current render baseline",
+      "render_ref": "rnd_a1d8f0a0be36",
+      "version": "v1"
+    },
+    {
+      "label": "Workflow 2 - Fabric Render",
+      "render_ref": "rnd_a1d8f0a0be36",
+      "version": "v1"
+    }
+  ],
+  "version_label": "v1"
+}

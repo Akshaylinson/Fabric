@@ -1,0 +1,22 @@
+[
+  {
+    "message": "Received render request for tpl_5861bf672b6c using images (2).jpg.",
+    "stage": "render-request",
+    "timestamp": "2026-06-25T11:33:35.844506+00:00"
+  },
+  {
+    "message": "Template tpl_5861bf672b6c loaded from the template service.",
+    "stage": "template-load",
+    "timestamp": "2026-06-25T11:33:35.844506+00:00"
+  },
+  {
+    "message": "Texture mapped using fabric color #475b74.",
+    "stage": "texture-mapping",
+    "timestamp": "2026-06-25T11:33:35.844506+00:00"
+  },
+  {
+    "message": "Render rnd_e22b869cb546 completed in 178.99 ms.",
+    "stage": "render-complete",
+    "timestamp": "2026-06-25T11:33:36.023501+00:00"
+  }
+]

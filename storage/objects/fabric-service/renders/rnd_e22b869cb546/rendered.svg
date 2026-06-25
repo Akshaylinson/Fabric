@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1800" width="1400" height="1800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="55%" stop-color="#eef2ff" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+    <radialGradient id="spot" cx="48%" cy="18%" r="68%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.82" />
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.24" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="shirtGrad" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#4f6581" />
+      <stop offset="46%" stop-color="#475b74" />
+      <stop offset="100%" stop-color="#334153" />
+    </linearGradient>
+    <linearGradient id="shirtShadow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.02" />
+    </linearGradient>
+    <linearGradient id="clothSheen" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0" />
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+    <pattern id="weave" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(28)">
+      <path d="M0 0 L22 22" stroke="#ffffff" stroke-opacity="0.08" stroke-width="4" />
+      <path d="M22 0 L0 22" stroke="#ffffff" stroke-opacity="0.04" stroke-width="4" />
+    </pattern>
+    <filter id="softShadow" x="-20%" y="-20%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="18" />
+    </filter>
+    <filter id="garmentBlur" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="1.5" />
+    </filter>
+    <clipPath id="shirtClip">
+      <path d="M293 270 L417 182 C464 150 513 134 566 134 L834 134 C887 134 936 150 983 182 L1107 270 L1038 452 L936 386 L936 1526 L464 1526 L464 386 L362 452 Z" />
+    </clipPath>
+    <clipPath id="sleeveLeftClip">
+      <path d="M305 275 L218 402 C174 466 164 528 175 590 C187 658 224 710 292 748 L357 785 L403 692 L357 666 C325 648 309 618 307 581 C305 547 319 510 347 470 L431 356 Z" />
+    </clipPath>
+    <clipPath id="sleeveRightClip">
+      <path d="M1095 275 L1182 402 C1226 466 1236 528 1225 590 C1213 658 1176 710 1108 748 L1043 785 L997 692 L1043 666 C1075 648 1091 618 1093 581 C1095 547 1081 510 1053 470 L969 356 Z" />
+    </clipPath>
+  </defs>
+
+  <rect width="100%" height="100%" fill="url(#bg)" />
+  <ellipse cx="700" cy="1508" rx="390" ry="88" fill="#0f172a" fill-opacity="0.14" filter="url(#softShadow)" />
+  <ellipse cx="700" cy="1472" rx="430" ry="122" fill="#0f172a" fill-opacity="0.06" />
+  <circle cx="1040" cy="248" r="250" fill="url(#spot)" />
+
+  <g transform="translate(0, 30)">
+    <g filter="url(#softShadow)">
+      <path d="M293 270 L417 182 C464 150 513 134 566 134 L834 134 C887 134 936 150 983 182 L1107 270 L1038 452 L936 386 L936 1526 L464 1526 L464 386 L362 452 Z" fill="#000000" fill-opacity="0.10" />
+      <path d="M305 275 L218 402 C174 466 164 528 175 590 C187 658 224 710 292 748 L357 785 L403 692 L357 666 C325 648 309 618 307 581 C305 547 319 510 347 470 L431 356 Z" fill="#000000" fill-opacity="0.10" />
+      <path d="M1095 275 L1182 402 C1226 466 1236 528 1225 590 C1213 658 1176 710 1108 748 L1043 785 L997 692 L1043 666 C1075 648 1091 618 1093 581 C1095 547 1081 510 1053 470 L969 356 Z" fill="#000000" fill-opacity="0.10" />
+    </g>
+
+    <path d="M293 270 L417 182 C464 150 513 134 566 134 L834 134 C887 134 936 150 983 182 L1107 270 L1038 452 L936 386 L936 1526 L464 1526 L464 386 L362 452 Z" fill="url(#shirtGrad)" stroke="#ffffff" stroke-opacity="0.44" stroke-width="7" />
+    <path d="M305 275 L218 402 C174 466 164 528 175 590 C187 658 224 710 292 748 L357 785 L403 692 L357 666 C325 648 309 618 307 581 C305 547 319 510 347 470 L431 356 Z" fill="url(#shirtGrad)" stroke="#ffffff" stroke-opacity="0.34" stroke-width="6" />
+    <path d="M1095 275 L1182 402 C1226 466 1236 528 1225 590 C1213 658 1176 710 1108 748 L1043 785 L997 692 L1043 666 C1075 648 1091 618 1093 581 C1095 547 1081 510 1053 470 L969 356 Z" fill="url(#shirtGrad)" stroke="#ffffff" stroke-opacity="0.34" stroke-width="6" />
+
+    <g clip-path="url(#shirtClip)">
+      <rect x="454" y="140" width="492" height="1400" fill="url(#shirtShadow)" />
+      <rect x="470" y="180" width="460" height="1310" fill="url(#weave)" opacity="0.9" />
+      <rect x="544" y="156" width="312" height="1316" fill="url(#clothSheen)" transform="rotate(-3 700 820)" opacity="0.95" />
+      <path d="M480 288 C560 360 632 384 700 384 C768 384 840 360 920 288 L920 1500 L480 1500 Z" fill="#ffffff" fill-opacity="0.03" />
+      <rect x="470" y="308" width="460" height="1210" fill="#ffffff" fill-opacity="0.02" />
+    </g>
+
+    <g clip-path="url(#sleeveLeftClip)">
+      <rect x="160" y="250" width="370" height="620" fill="url(#weave)" opacity="0.82" />
+      <rect x="168" y="250" width="360" height="620" fill="#ffffff" fill-opacity="0.03" />
+    </g>
+
+    <g clip-path="url(#sleeveRightClip)">
+      <rect x="872" y="250" width="370" height="620" fill="url(#weave)" opacity="0.82" />
+      <rect x="872" y="250" width="360" height="620" fill="#ffffff" fill-opacity="0.03" />
+    </g>
+
+    <path d="M408 210 L496 164 L582 278 L818 278 L904 164 L992 210 L918 348 L482 348 Z" fill="#ffffff" fill-opacity="0.16" stroke="#ffffff" stroke-opacity="0.56" stroke-width="6" />
+    <path d="M533 182 L600 150 L700 272 L800 150 L867 182 L811 286 L589 286 Z" fill="#ffffff" fill-opacity="0.28" />
+    <path d="M445 346 L510 382 L510 1510 L445 1510 Z" fill="#000000" fill-opacity="0.06" />
+    <path d="M955 346 L890 382 L890 1510 L955 1510 Z" fill="#000000" fill-opacity="0.06" />
+
+    <path d="M618 350 C650 378 676 392 700 392 C724 392 750 378 782 350" fill="none" stroke="#ffffff" stroke-opacity="0.74" stroke-width="7" stroke-linecap="round" />
+    <path d="M700 392 L700 1460" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="4" stroke-linecap="round" />
+    <circle cx="700" cy="460" r="11" fill="#ffffff" fill-opacity="0.82" />
+    <circle cx="700" cy="540" r="11" fill="#ffffff" fill-opacity="0.82" />
+    <circle cx="700" cy="620" r="11" fill="#ffffff" fill-opacity="0.82" />
+    <circle cx="700" cy="700" r="11" fill="#ffffff" fill-opacity="0.82" />
+    <circle cx="700" cy="780" r="11" fill="#ffffff" fill-opacity="0.82" />
+
+    <path d="M488 344 L570 344 L570 1482 L488 1482 Z" fill="#ffffff" fill-opacity="0.02" />
+    <path d="M830 344 L912 344 L912 1482 L830 1482 Z" fill="#ffffff" fill-opacity="0.02" />
+
+    <path d="M398 386 C416 362 436 346 464 338" fill="none" stroke="#ffffff" stroke-opacity="0.34" stroke-width="6" stroke-linecap="round" />
+    <path d="M1002 386 C984 362 964 346 936 338" fill="none" stroke="#ffffff" stroke-opacity="0.34" stroke-width="6" stroke-linecap="round" />
+
+    <path d="M318 694 L318 1460 C318 1492 344 1518 376 1518 L446 1518 L470 1458 L398 1458 C378 1458 362 1442 362 1422 L362 748 C362 730 350 708 318 694 Z" fill="#273240" fill-opacity="0.36" />
+    <path d="M1082 694 L1082 1460 C1082 1492 1056 1518 1024 1518 L954 1518 L930 1458 L1002 1458 C1022 1458 1038 1442 1038 1422 L1038 748 C1038 730 1050 708 1082 694 Z" fill="#273240" fill-opacity="0.36" />
+
+    <path d="M274 1448 L236 1538 L178 1538 L162 1474 L190 1448 Z" fill="#334153" />
+    <path d="M1126 1448 L1164 1538 L1222 1538 L1238 1474 L1210 1448 Z" fill="#334153" />
+  </g>
+
+  <rect x="30" y="30" width="1340" height="1740" rx="50" fill="none" stroke="#ffffff" stroke-opacity="0.28" stroke-width="2" />
+</svg>

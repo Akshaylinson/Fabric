@@ -147,6 +147,16 @@ def _fabric_color_from_bytes(raw_bytes: bytes) -> tuple[str, str]:
     return hex_color, text_color
 
 
+def _shade_color(hex_color: str, factor: float) -> str:
+    r = int(hex_color[1:3], 16)
+    g = int(hex_color[3:5], 16)
+    b = int(hex_color[5:7], 16)
+    r = max(0, min(255, int(r * factor)))
+    g = max(0, min(255, int(g * factor)))
+    b = max(0, min(255, int(b * factor)))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
 @router.post("/fabric/render")
 def render_fabric(request: FabricRenderRequest) -> dict[str, object]:
     started_at = datetime.now(timezone.utc)
@@ -166,67 +176,125 @@ def render_fabric(request: FabricRenderRequest) -> dict[str, object]:
         fabric_color = f"#{fallback_digest[0:2]}{fallback_digest[2:4]}{fallback_digest[4:6]}"
         text_color = "#ffffff"
 
+    fabric_dark = _shade_color(fabric_color, 0.72)
+    fabric_mid = _shade_color(fabric_color, 0.88)
+    fabric_light = _shade_color(fabric_color, 1.12)
+    shadow_color = _shade_color(fabric_color, 0.56)
+
     transfer = FabricTransferAdapter().transfer(request.fabric_ref, request.template_ref)
     mapping = TextureMappingAdapter().map_texture(request.fabric_ref, request.template_ref)
 
     completed_at = datetime.now(timezone.utc)
     processing_time_ms = round((perf_counter() - timer_started) * 1000, 2)
     render_id = f"rnd_{uuid4().hex[:12]}"
-    render_svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1600" viewBox="0 0 1200 1600">
+    render_svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1800" width="1400" height="1800">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="55%" stop-color="#eef2ff" />
       <stop offset="100%" stop-color="#e2e8f0" />
     </linearGradient>
-    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="100%" stop-color="#eff6ff" />
+    <radialGradient id="spot" cx="48%" cy="18%" r="68%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.82" />
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.24" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="shirtGrad" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="{fabric_light}" />
+      <stop offset="46%" stop-color="{fabric_color}" />
+      <stop offset="100%" stop-color="{fabric_dark}" />
     </linearGradient>
-    <linearGradient id="fabricGlow" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="{fabric_color}" stop-opacity="1" />
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.28" />
+    <linearGradient id="shirtShadow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.02" />
     </linearGradient>
-    <pattern id="fabricPattern" width="28" height="28" patternUnits="userSpaceOnUse">
-      <path d="M0 28 L28 0" stroke="#ffffff" stroke-opacity="0.12" stroke-width="4" />
+    <linearGradient id="clothSheen" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0" />
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+    <pattern id="weave" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(28)">
+      <path d="M0 0 L22 22" stroke="#ffffff" stroke-opacity="0.08" stroke-width="4" />
+      <path d="M22 0 L0 22" stroke="#ffffff" stroke-opacity="0.04" stroke-width="4" />
     </pattern>
+    <filter id="softShadow" x="-20%" y="-20%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="18" />
+    </filter>
+    <filter id="garmentBlur" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="1.5" />
+    </filter>
+    <clipPath id="shirtClip">
+      <path d="M293 270 L417 182 C464 150 513 134 566 134 L834 134 C887 134 936 150 983 182 L1107 270 L1038 452 L936 386 L936 1526 L464 1526 L464 386 L362 452 Z" />
+    </clipPath>
+    <clipPath id="sleeveLeftClip">
+      <path d="M305 275 L218 402 C174 466 164 528 175 590 C187 658 224 710 292 748 L357 785 L403 692 L357 666 C325 648 309 618 307 581 C305 547 319 510 347 470 L431 356 Z" />
+    </clipPath>
+    <clipPath id="sleeveRightClip">
+      <path d="M1095 275 L1182 402 C1226 466 1236 528 1225 590 C1213 658 1176 710 1108 748 L1043 785 L997 692 L1043 666 C1075 648 1091 618 1093 581 C1095 547 1081 510 1053 470 L969 356 Z" />
+    </clipPath>
   </defs>
+
   <rect width="100%" height="100%" fill="url(#bg)" />
-  <circle cx="980" cy="180" r="220" fill="{fabric_color}" fill-opacity="0.14" />
-  <circle cx="170" cy="1380" r="260" fill="#0f172a" fill-opacity="0.05" />
-  <rect x="88" y="88" width="1024" height="1424" rx="44" fill="url(#panel)" stroke="#cbd5e1" stroke-width="2" />
-  <rect x="132" y="132" width="286" height="78" rx="22" fill="{fabric_color}" />
-  <text x="175" y="184" fill="{text_color}" font-size="30" font-family="Arial, sans-serif" font-weight="700">Workflow 2 Render</text>
-  <text x="900" y="183" text-anchor="end" fill="#334155" font-size="22" font-family="Arial, sans-serif">{request.render_label or 'Fabric Mapping QA'}</text>
+  <ellipse cx="700" cy="1508" rx="390" ry="88" fill="#0f172a" fill-opacity="0.14" filter="url(#softShadow)" />
+  <ellipse cx="700" cy="1472" rx="430" ry="122" fill="#0f172a" fill-opacity="0.06" />
+  <circle cx="1040" cy="248" r="250" fill="url(#spot)" />
 
-  <text x="132" y="292" fill="#334155" font-size="22" font-family="Arial, sans-serif">Template</text>
-  <text x="132" y="326" fill="#0f172a" font-size="34" font-family="Arial, sans-serif" font-weight="700">{template.get('template_name', request.template_ref)}</text>
-  <text x="132" y="382" fill="#64748b" font-size="22" font-family="Arial, sans-serif">Fabric ref: {request.fabric_ref}</text>
-  <text x="132" y="418" fill="#64748b" font-size="22" font-family="Arial, sans-serif">Render time: {processing_time_ms} ms</text>
+  <g transform="translate(0, 30)">
+    <g filter="url(#softShadow)">
+      <path d="M293 270 L417 182 C464 150 513 134 566 134 L834 134 C887 134 936 150 983 182 L1107 270 L1038 452 L936 386 L936 1526 L464 1526 L464 386 L362 452 Z" fill="#000000" fill-opacity="0.10" />
+      <path d="M305 275 L218 402 C174 466 164 528 175 590 C187 658 224 710 292 748 L357 785 L403 692 L357 666 C325 648 309 618 307 581 C305 547 319 510 347 470 L431 356 Z" fill="#000000" fill-opacity="0.10" />
+      <path d="M1095 275 L1182 402 C1226 466 1236 528 1225 590 C1213 658 1176 710 1108 748 L1043 785 L997 692 L1043 666 C1075 648 1091 618 1093 581 C1095 547 1081 510 1053 470 L969 356 Z" fill="#000000" fill-opacity="0.10" />
+    </g>
 
-  <rect x="132" y="476" width="936" height="700" rx="36" fill="#ffffff" stroke="#dbeafe" stroke-width="2" />
-  <rect x="192" y="536" width="816" height="580" rx="32" fill="{fabric_color}" fill-opacity="0.14" stroke="{fabric_color}" stroke-width="4" />
-  <rect x="228" y="572" width="744" height="508" rx="26" fill="url(#fabricGlow)" />
-  <rect x="228" y="572" width="744" height="508" rx="26" fill="url(#fabricPattern)" />
-  <path d="M405 642 C440 604, 760 604, 795 642 L850 730 L820 1118 C792 1155, 408 1155, 380 1118 L350 730 Z" fill="{fabric_color}" stroke="#0f172a" stroke-opacity="0.15" stroke-width="6" />
-  <path d="M520 640 L600 725 L680 640" fill="none" stroke="#ffffff" stroke-opacity="0.65" stroke-width="8" stroke-linecap="round" />
-  <path d="M600 725 L600 1140" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="4" stroke-linecap="round" />
-  <rect x="552" y="766" width="96" height="240" rx="24" fill="#ffffff" fill-opacity="0.12" />
-  <rect x="260" y="790" width="86" height="202" rx="24" fill="#ffffff" fill-opacity="0.12" />
-  <rect x="854" y="790" width="86" height="202" rx="24" fill="#ffffff" fill-opacity="0.12" />
-  <circle cx="600" cy="823" r="28" fill="#ffffff" fill-opacity="0.6" />
-  <circle cx="600" cy="888" r="28" fill="#ffffff" fill-opacity="0.6" />
-  <circle cx="600" cy="953" r="28" fill="#ffffff" fill-opacity="0.6" />
+    <path d="M293 270 L417 182 C464 150 513 134 566 134 L834 134 C887 134 936 150 983 182 L1107 270 L1038 452 L936 386 L936 1526 L464 1526 L464 386 L362 452 Z" fill="url(#shirtGrad)" stroke="#ffffff" stroke-opacity="0.44" stroke-width="7" />
+    <path d="M305 275 L218 402 C174 466 164 528 175 590 C187 658 224 710 292 748 L357 785 L403 692 L357 666 C325 648 309 618 307 581 C305 547 319 510 347 470 L431 356 Z" fill="url(#shirtGrad)" stroke="#ffffff" stroke-opacity="0.34" stroke-width="6" />
+    <path d="M1095 275 L1182 402 C1226 466 1236 528 1225 590 C1213 658 1176 710 1108 748 L1043 785 L997 692 L1043 666 C1075 648 1091 618 1093 581 C1095 547 1081 510 1053 470 L969 356 Z" fill="url(#shirtGrad)" stroke="#ffffff" stroke-opacity="0.34" stroke-width="6" />
 
-  <rect x="132" y="1242" width="296" height="166" rx="28" fill="#0f172a" fill-opacity="0.04" />
-  <rect x="154" y="1268" width="84" height="84" rx="20" fill="{fabric_color}" />
-  <text x="258" y="1296" fill="#334155" font-size="20" font-family="Arial, sans-serif">Fabric swatch</text>
-  <text x="258" y="1332" fill="#0f172a" font-size="28" font-family="Arial, sans-serif" font-weight="700">{fabric_color}</text>
-  <text x="258" y="1368" fill="#64748b" font-size="18" font-family="Arial, sans-serif">Mapped from the uploaded image</text>
+    <g clip-path="url(#shirtClip)">
+      <rect x="454" y="140" width="492" height="1400" fill="url(#shirtShadow)" />
+      <rect x="470" y="180" width="460" height="1310" fill="url(#weave)" opacity="0.9" />
+      <rect x="544" y="156" width="312" height="1316" fill="url(#clothSheen)" transform="rotate(-3 700 820)" opacity="0.95" />
+      <path d="M480 288 C560 360 632 384 700 384 C768 384 840 360 920 288 L920 1500 L480 1500 Z" fill="#ffffff" fill-opacity="0.03" />
+      <rect x="470" y="308" width="460" height="1210" fill="#ffffff" fill-opacity="0.02" />
+    </g>
 
-  <rect x="470" y="1242" width="598" height="166" rx="28" fill="#0f172a" fill-opacity="0.04" />
-  <text x="500" y="1290" fill="#334155" font-size="20" font-family="Arial, sans-serif">Structure preserved</text>
-  <text x="500" y="1332" fill="#0f172a" font-size="28" font-family="Arial, sans-serif" font-weight="700">{transfer.rendered_image_ref.split('/')[-1]}</text>
-  <text x="500" y="1368" fill="#64748b" font-size="18" font-family="Arial, sans-serif">Garment silhouette stays fixed while fabric appearance changes</text>
+    <g clip-path="url(#sleeveLeftClip)">
+      <rect x="160" y="250" width="370" height="620" fill="url(#weave)" opacity="0.82" />
+      <rect x="168" y="250" width="360" height="620" fill="#ffffff" fill-opacity="0.03" />
+    </g>
+
+    <g clip-path="url(#sleeveRightClip)">
+      <rect x="872" y="250" width="370" height="620" fill="url(#weave)" opacity="0.82" />
+      <rect x="872" y="250" width="360" height="620" fill="#ffffff" fill-opacity="0.03" />
+    </g>
+
+    <path d="M408 210 L496 164 L582 278 L818 278 L904 164 L992 210 L918 348 L482 348 Z" fill="#ffffff" fill-opacity="0.16" stroke="#ffffff" stroke-opacity="0.56" stroke-width="6" />
+    <path d="M533 182 L600 150 L700 272 L800 150 L867 182 L811 286 L589 286 Z" fill="#ffffff" fill-opacity="0.28" />
+    <path d="M445 346 L510 382 L510 1510 L445 1510 Z" fill="#000000" fill-opacity="0.06" />
+    <path d="M955 346 L890 382 L890 1510 L955 1510 Z" fill="#000000" fill-opacity="0.06" />
+
+    <path d="M618 350 C650 378 676 392 700 392 C724 392 750 378 782 350" fill="none" stroke="#ffffff" stroke-opacity="0.74" stroke-width="7" stroke-linecap="round" />
+    <path d="M700 392 L700 1460" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="4" stroke-linecap="round" />
+    <circle cx="700" cy="460" r="11" fill="#ffffff" fill-opacity="0.82" />
+    <circle cx="700" cy="540" r="11" fill="#ffffff" fill-opacity="0.82" />
+    <circle cx="700" cy="620" r="11" fill="#ffffff" fill-opacity="0.82" />
+    <circle cx="700" cy="700" r="11" fill="#ffffff" fill-opacity="0.82" />
+    <circle cx="700" cy="780" r="11" fill="#ffffff" fill-opacity="0.82" />
+
+    <path d="M488 344 L570 344 L570 1482 L488 1482 Z" fill="#ffffff" fill-opacity="0.02" />
+    <path d="M830 344 L912 344 L912 1482 L830 1482 Z" fill="#ffffff" fill-opacity="0.02" />
+
+    <path d="M398 386 C416 362 436 346 464 338" fill="none" stroke="#ffffff" stroke-opacity="0.34" stroke-width="6" stroke-linecap="round" />
+    <path d="M1002 386 C984 362 964 346 936 338" fill="none" stroke="#ffffff" stroke-opacity="0.34" stroke-width="6" stroke-linecap="round" />
+
+    <path d="M318 694 L318 1460 C318 1492 344 1518 376 1518 L446 1518 L470 1458 L398 1458 C378 1458 362 1442 362 1422 L362 748 C362 730 350 708 318 694 Z" fill="{shadow_color}" fill-opacity="0.36" />
+    <path d="M1082 694 L1082 1460 C1082 1492 1056 1518 1024 1518 L954 1518 L930 1458 L1002 1458 C1022 1458 1038 1442 1038 1422 L1038 748 C1038 730 1050 708 1082 694 Z" fill="{shadow_color}" fill-opacity="0.36" />
+
+    <path d="M274 1448 L236 1538 L178 1538 L162 1474 L190 1448 Z" fill="{fabric_dark}" />
+    <path d="M1126 1448 L1164 1538 L1222 1538 L1238 1474 L1210 1448 Z" fill="{fabric_dark}" />
+  </g>
+
+  <rect x="30" y="30" width="1340" height="1740" rx="50" fill="none" stroke="#ffffff" stroke-opacity="0.28" stroke-width="2" />
 </svg>'''
     render_uri = _STORAGE.put_text(f"renders/{render_id}/rendered.svg", render_svg)
     version_label = "v2" if request.comparison_render_ref else "v1"
@@ -266,7 +334,7 @@ def render_fabric(request: FabricRenderRequest) -> dict[str, object]:
         "metadata": {
             "preserved_structure": mapping.preserved_structure,
             "fabric_fit": "applied",
-            "texture_strategy": "svg_fabric_color_composite",
+            "texture_strategy": "svg_full_bleed_shirt",
             "garment_area_covered": "98.6%",
             "fabric_color": fabric_color,
         },
