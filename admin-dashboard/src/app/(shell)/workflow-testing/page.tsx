@@ -138,6 +138,9 @@ export default function WorkflowTestingPage() {
       front_image_ref: frontImage.ref,
       back_image_ref: backImage.ref,
       side_image_ref: sideImage.ref,
+      front_image_data: frontImage.preview || undefined,
+      back_image_data: backImage.preview || undefined,
+      side_image_data: sideImage.preview || undefined,
       image_refs: [frontImage.ref, backImage.ref, sideImage.ref],
       creator_id: creatorId.trim() || 'designer_042',
       creator_name: creatorName.trim() || 'Asha Kumar'

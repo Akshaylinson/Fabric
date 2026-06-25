@@ -14,10 +14,18 @@ export type Workflow2ProcessingLog = {
 export type Workflow2RenderRequest = {
   fabric_ref: string;
   template_ref: string;
+  fabric_image_data?: string;
   render_label?: string;
   comparison_render_ref?: string;
 };
 
+export type Workflow2TemplateSummary = {
+  template_id: string;
+  template_name: string;
+  created_at: string;
+  updated_at: string;
+  analysis_version: number;
+};
 export type Workflow2RenderResponse = {
   render_id: string;
   render_label: string;
@@ -71,6 +79,18 @@ async function parseResponse<T>(response: Response): Promise<T> {
   }
 
   return (await response.json()) as T;
+}
+
+export async function listWorkflow2Templates(
+  options: Workflow2RequestOptions = {}
+): Promise<{ items: Workflow2TemplateSummary[] }> {
+  const response = await fetch('/api/workflow-1/templates', {
+    method: 'GET',
+    headers: buildHeaders(options.token),
+    cache: 'no-store'
+  });
+
+  return parseResponse<{ items: Workflow2TemplateSummary[] }>(response);
 }
 
 export async function renderWorkflow2Garment(

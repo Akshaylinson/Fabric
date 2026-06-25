@@ -1,4 +1,4 @@
-services:
+﻿services:
   postgres:
     image: postgres:16-alpine
     environment:
@@ -87,29 +87,40 @@ services:
         condition: service_started
 
   orchestrator-service:
-    build: ./orchestrator-service
+    build:
+      context: .
+      dockerfile: orchestrator-service/Dockerfile
     env_file: .env
     environment:
       PORT: ${ORCHESTRATOR_SERVICE_PORT}
       REDIS_URL: ${REDIS_URL}
+      TEXTILE_STORAGE_ROOT: /data
       TEMPLATE_SERVICE_URL: http://template-service:${TEMPLATE_SERVICE_PORT}
       FABRIC_SERVICE_URL: http://fabric-service:${FABRIC_SERVICE_PORT}
       TRYON_SERVICE_URL: http://tryon-service:${TRYON_SERVICE_PORT}
     ports:
       - "8000:8000"
+    volumes:
+      - ./storage:/data
     depends_on:
       redis:
         condition: service_healthy
 
   template-service:
-    build: ./template-service
+    build:
+      context: .
+      dockerfile: template-service/Dockerfile
     env_file: .env
     environment:
       PORT: ${TEMPLATE_SERVICE_PORT}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT}
       REDIS_URL: ${REDIS_URL}
+      TEXTILE_STORAGE_ROOT: /data
+      ORCHESTRATOR_SERVICE_URL: http://orchestrator-service:${ORCHESTRATOR_SERVICE_PORT}
     ports:
       - "8001:8001"
+    volumes:
+      - ./storage:/data
     depends_on:
       minio:
         condition: service_started
@@ -117,25 +128,40 @@ services:
         condition: service_healthy
 
   fabric-service:
-    build: ./fabric-service
+    build:
+      context: .
+      dockerfile: fabric-service/Dockerfile
     env_file: .env
     environment:
       PORT: ${FABRIC_SERVICE_PORT}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      TEXTILE_STORAGE_ROOT: /data
+      TEMPLATE_SERVICE_URL: http://template-service:${TEMPLATE_SERVICE_PORT}
+      ORCHESTRATOR_SERVICE_URL: http://orchestrator-service:${ORCHESTRATOR_SERVICE_PORT}
     ports:
       - "8002:8002"
+    volumes:
+      - ./storage:/data
     depends_on:
       minio:
         condition: service_started
+      template-service:
+        condition: service_started
 
   tryon-service:
-    build: ./tryon-service
+    build:
+      context: .
+      dockerfile: tryon-service/Dockerfile
     env_file: .env
     environment:
       PORT: ${TRYON_SERVICE_PORT}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      TEXTILE_STORAGE_ROOT: /data
+      ORCHESTRATOR_SERVICE_URL: http://orchestrator-service:${ORCHESTRATOR_SERVICE_PORT}
     ports:
       - "8003:8003"
+    volumes:
+      - ./storage:/data
     depends_on:
       minio:
         condition: service_started
@@ -180,4 +206,3 @@ volumes:
   postgres_data:
   redis_data:
   minio_data:
-

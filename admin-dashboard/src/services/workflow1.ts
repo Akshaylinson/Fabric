@@ -1,4 +1,4 @@
-export type Workflow1ImageSelection = {
+﻿export type Workflow1ImageSelection = {
   ref: string;
   preview: string;
   fileName: string;
@@ -16,6 +16,9 @@ export type Workflow1TemplateRequest = {
   front_image_ref: string;
   back_image_ref: string;
   side_image_ref: string;
+  front_image_data?: string;
+  back_image_data?: string;
+  side_image_data?: string;
   image_refs: string[];
   creator_id: string;
   creator_name: string;

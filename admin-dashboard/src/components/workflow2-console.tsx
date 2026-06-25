@@ -1,15 +1,16 @@
 ﻿'use client';
 
-import { ChangeEvent, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 
 import { Card, Pill, SectionTitle } from '@/components/ui';
 import { useAuthStore } from '@/stores/auth-store';
-import { templates as mockTemplates } from '@/services/mock-data';
 import {
+  listWorkflow2Templates,
   renderWorkflow2Garment,
   type Workflow2ImageSelection,
   type Workflow2RenderRequest,
-  type Workflow2RenderResponse
+  type Workflow2RenderResponse,
+  type Workflow2TemplateSummary
 } from '@/services/workflow2';
 
 function createEmptySelection(placeholder: string): Workflow2ImageSelection {
@@ -68,18 +69,52 @@ function FabricUploadCard({
 export function Workflow2Console() {
   const token = useAuthStore((state) => state.token);
   const [fabricImage, setFabricImage] = useState(createEmptySelection('fabric_selection_ref.png'));
-  const [templateRef, setTemplateRef] = useState(mockTemplates[0]?.id ?? 'tpl_001');
+  const [templates, setTemplates] = useState<Workflow2TemplateSummary[]>([]);
+  const [templateRef, setTemplateRef] = useState('');
   const [renderLabel, setRenderLabel] = useState('Workflow 2 - Fabric Render');
   const [comparisonRenderRef, setComparisonRenderRef] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingTemplates, setIsLoadingTemplates] = useState(true);
   const [statusMessage, setStatusMessage] = useState('Ready to map a fabric onto a selected template.');
   const [error, setError] = useState<string | null>(null);
   const [requestPayload, setRequestPayload] = useState<Workflow2RenderRequest | null>(null);
   const [result, setResult] = useState<Workflow2RenderResponse | null>(null);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadTemplates() {
+      setIsLoadingTemplates(true);
+      try {
+        const response = await listWorkflow2Templates({ token });
+        if (cancelled) {
+          return;
+        }
+        setTemplates(response.items);
+        setTemplateRef((current) => current || response.items[0]?.template_id || '');
+        setStatusMessage(response.items.length ? 'Templates loaded from the template service.' : 'No templates found yet. Create one in Workflow 1 first.');
+      } catch (cause) {
+        if (!cancelled) {
+          const message = cause instanceof Error ? cause.message : 'Unable to load templates.';
+          setError(message);
+          setStatusMessage('Unable to load live templates.');
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingTemplates(false);
+        }
+      }
+    }
+
+    void loadTemplates();
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
   const selectedTemplate = useMemo(
-    () => mockTemplates.find((item) => item.id === templateRef) ?? mockTemplates[0],
-    [templateRef]
+    () => templates.find((item) => item.template_id === templateRef) ?? templates[0] ?? null,
+    [templateRef, templates]
   );
 
   async function updateSelection(event: ChangeEvent<HTMLInputElement>) {
@@ -101,7 +136,8 @@ export function Workflow2Console() {
   function buildPayload(compareAgainstCurrent = false): Workflow2RenderRequest {
     return {
       fabric_ref: fabricImage.ref,
-      template_ref: templateRef.trim() || selectedTemplate?.id || 'tpl_001',
+      template_ref: templateRef.trim() || selectedTemplate?.template_id || 'tpl_001',
+      fabric_image_data: fabricImage.preview || undefined,
       render_label: renderLabel.trim() || 'Workflow 2 Fabric Render',
       comparison_render_ref: compareAgainstCurrent ? result?.render_id ?? undefined : comparisonRenderRef.trim() || undefined
     };
@@ -139,11 +175,11 @@ export function Workflow2Console() {
         <SectionTitle
           eyebrow="Testing Console"
           title="Workflow 2 - Fabric Mapping"
-          description="Select a template, upload fabric, generate a render, compare versions, and inspect the full mock payloads and logs."
+          description="Select a live template, upload fabric, generate a render, compare versions, and inspect the full mock payloads and logs."
         />
         <div className="flex flex-wrap gap-2">
           <Pill tone={result ? 'success' : 'neutral'}>{result ? 'Render ready' : 'Awaiting render'}</Pill>
-          <Pill tone={isSubmitting ? 'warning' : 'neutral'}>{isSubmitting ? 'Processing' : 'Idle'}</Pill>
+          <Pill tone={isSubmitting ? 'warning' : 'neutral'}>{isSubmitting ? 'Processing' : isLoadingTemplates ? 'Loading templates' : 'Idle'}</Pill>
           <Pill>QA mode</Pill>
         </div>
       </div>
@@ -153,22 +189,23 @@ export function Workflow2Console() {
           <div className="flex items-center justify-between gap-4">
             <div>
               <h3 className="text-xl font-semibold text-white">Input Capture</h3>
-              <p className="mt-1 text-sm text-slate-300">Stage the fabric and template used by the mock fabric service.</p>
+              <p className="mt-1 text-sm text-slate-300">Stage the fabric and template used by the fabric service.</p>
             </div>
             <Pill tone="neutral">Workflow 2</Pill>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="space-y-2">
+            <label className="space-y-2 md:col-span-2">
               <span className="text-sm text-slate-300">Template</span>
               <select
                 value={templateRef}
                 onChange={(event) => setTemplateRef(event.target.value)}
                 className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-400/40"
               >
-                {mockTemplates.map((template) => (
-                  <option key={template.id} value={template.id} className="bg-slate-950 text-white">
-                    {template.id} - {template.name}
+                <option value="" className="bg-slate-950 text-white">Select a template</option>
+                {templates.map((template) => (
+                  <option key={template.template_id} value={template.template_id} className="bg-slate-950 text-white">
+                    {template.template_id} - {template.template_name}
                   </option>
                 ))}
               </select>
@@ -182,7 +219,7 @@ export function Workflow2Console() {
                 placeholder="Workflow 2 - Fabric Render"
               />
             </label>
-            <label className="space-y-2 md:col-span-2">
+            <label className="space-y-2">
               <span className="text-sm text-slate-300">Compare against render ref</span>
               <input
                 value={comparisonRenderRef}
@@ -198,7 +235,7 @@ export function Workflow2Console() {
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !templateRef}
               onClick={() => void handleGenerateRender()}
               className="rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
             >
@@ -223,6 +260,7 @@ export function Workflow2Console() {
               <Pill tone={error ? 'danger' : 'success'}>{error ? 'Needs attention' : 'Connected'}</Pill>
             </div>
             {error ? <div className="mt-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{error}</div> : null}
+            {!templates.length && !isLoadingTemplates ? <div className="mt-3 text-sm text-amber-200">Create a Workflow 1 template first so this console can load it from the backend.</div> : null}
           </div>
         </Card>
 
@@ -241,7 +279,7 @@ export function Workflow2Console() {
               <div className="mt-3 flex min-h-56 items-center justify-center rounded-2xl border border-dashed border-white/10 bg-slate-950/70 p-4">
                 <div className="space-y-2 text-center">
                   <div className="text-xs uppercase tracking-[0.28em] text-cyan-300/80">Preview</div>
-                  <div className="text-sm font-medium text-white">{selectedTemplate?.name ?? 'Template pending'}</div>
+                  <div className="text-sm font-medium text-white">{selectedTemplate?.template_name ?? 'Template pending'}</div>
                   <p className="max-w-xs text-xs leading-6 text-slate-400">{outputRender}</p>
                 </div>
               </div>

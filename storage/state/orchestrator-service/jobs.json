@@ -1,0 +1,35 @@
+{
+  "job_6b0460e2744a": {
+    "action": "render-fabric",
+    "child_job_ids": [],
+    "created_at": "2026-06-25T10:24:20.942276+00:00",
+    "entity_id": "rnd_45261d93e973",
+    "job_id": "job_6b0460e2744a",
+    "parent_job_id": null,
+    "payload": {
+      "fabric_ref": "download.jpg",
+      "render_id": "rnd_45261d93e973",
+      "template_ref": "tpl_5861bf672b6c"
+    },
+    "retry_count": 0,
+    "status": "completed",
+    "updated_at": "2026-06-25T10:24:20.942276+00:00",
+    "workflow": "workflow-2"
+  },
+  "job_d0c543679f3a": {
+    "action": "create-template",
+    "child_job_ids": [],
+    "created_at": "2026-06-25T10:23:13.043934+00:00",
+    "entity_id": "tpl_5861bf672b6c",
+    "job_id": "job_d0c543679f3a",
+    "parent_job_id": null,
+    "payload": {
+      "template_id": "tpl_5861bf672b6c",
+      "template_name": "Korean Shell Line"
+    },
+    "retry_count": 0,
+    "status": "completed",
+    "updated_at": "2026-06-25T10:23:13.043934+00:00",
+    "workflow": "workflow-1"
+  }
+}
