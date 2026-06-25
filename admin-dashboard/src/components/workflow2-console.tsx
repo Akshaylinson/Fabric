@@ -167,7 +167,7 @@ export function Workflow2Console() {
     }
   }
 
-  const outputRender = result?.rendered_image_ref ?? 'Rendered garment preview will appear here.';
+  const renderImageUrl = result ? `/api/workflow-2/renders/${result.render_id}/image` : null;
 
   return (
     <Card className="space-y-6">
@@ -276,12 +276,20 @@ export function Workflow2Console() {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-4">
               <div className="text-sm font-semibold text-white">Generated Garment</div>
-              <div className="mt-3 flex min-h-56 items-center justify-center rounded-2xl border border-dashed border-white/10 bg-slate-950/70 p-4">
-                <div className="space-y-2 text-center">
-                  <div className="text-xs uppercase tracking-[0.28em] text-cyan-300/80">Preview</div>
-                  <div className="text-sm font-medium text-white">{selectedTemplate?.template_name ?? 'Template pending'}</div>
-                  <p className="max-w-xs text-xs leading-6 text-slate-400">{outputRender}</p>
-                </div>
+              <div className="mt-3 flex min-h-56 items-center justify-center overflow-hidden rounded-2xl border border-dashed border-white/10 bg-slate-950/70 p-2">
+                {renderImageUrl ? (
+                  <img
+                    src={renderImageUrl}
+                    alt={result?.render_label || 'Workflow 2 generated garment'}
+                    className="h-full w-full rounded-xl object-contain"
+                  />
+                ) : (
+                  <div className="space-y-2 text-center">
+                    <div className="text-xs uppercase tracking-[0.28em] text-cyan-300/80">Preview</div>
+                    <div className="text-sm font-medium text-white">{selectedTemplate?.template_name ?? 'Template pending'}</div>
+                    <p className="max-w-xs text-xs leading-6 text-slate-400">Generated garment image will appear here after a successful render.</p>
+                  </div>
+                )}
               </div>
             </div>
             <div className="rounded-3xl border border-white/10 bg-white/5 p-4">

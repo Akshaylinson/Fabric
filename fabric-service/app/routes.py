@@ -5,11 +5,13 @@ import os
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
+from pathlib import Path
 from time import perf_counter
 from typing import Any
 from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from app.adapters import FabricTransferAdapter, TextureMappingAdapter
@@ -88,6 +90,24 @@ def _register_job(workflow: str, entity_id: str, action: str, payload: dict[str,
             return body.get("job_id")
     except (urllib.error.URLError, TimeoutError, ValueError):
         return None
+
+
+def _render_image_path(render_id: str) -> Path:
+    svg_path = _STORAGE.path_for(f"renders/{render_id}/rendered.svg")
+    if svg_path.exists():
+        return svg_path
+
+    return _STORAGE.path_for(f"renders/{render_id}/rendered.png")
+
+
+@router.get("/renders/{render_id}/image")
+def get_render_image(render_id: str):
+    image_path = _render_image_path(render_id)
+    if not image_path.exists():
+        raise HTTPException(status_code=404, detail="Render image not found")
+
+    media_type = "image/svg+xml" if image_path.suffix.lower() == ".svg" else "image/png"
+    return FileResponse(image_path, media_type=media_type, headers={"Cache-Control": "no-store"})
 
 
 @router.post("/fabric/render")

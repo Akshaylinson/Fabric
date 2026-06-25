@@ -1,0 +1,22 @@
+[
+  {
+    "message": "Received render request for tpl_5861bf672b6c using download.jpg.",
+    "stage": "render-request",
+    "timestamp": "2026-06-25T10:40:13.149308+00:00"
+  },
+  {
+    "message": "Template tpl_5861bf672b6c loaded from the template service.",
+    "stage": "template-load",
+    "timestamp": "2026-06-25T10:40:13.149308+00:00"
+  },
+  {
+    "message": "Texture mapping adapter preserved garment structure and applied fabric appearance.",
+    "stage": "texture-mapping",
+    "timestamp": "2026-06-25T10:40:13.149308+00:00"
+  },
+  {
+    "message": "Render rnd_177e03ce9c86 completed in 176.92 ms.",
+    "stage": "render-complete",
+    "timestamp": "2026-06-25T10:40:13.326232+00:00"
+  }
+]
