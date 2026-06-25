@@ -1,4 +1,4 @@
-﻿export type Workflow1ImageSelection = {
+export type Workflow1ImageSelection = {
   ref: string;
   preview: string;
   fileName: string;
@@ -55,6 +55,17 @@ export type Workflow1ReanalyzeRequest = {
   reason?: string;
 };
 
+type Workflow1RequestOptions = {
+  token?: string | null;
+};
+
+function buildHeaders(token?: string | null): HeadersInit {
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {})
+  };
+}
+
 async function parseResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const detail = await response.text();
@@ -64,12 +75,13 @@ async function parseResponse<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
-export async function createWorkflow1Template(payload: Workflow1TemplateRequest): Promise<Workflow1TemplateResponse> {
+export async function createWorkflow1Template(
+  payload: Workflow1TemplateRequest,
+  options: Workflow1RequestOptions = {}
+): Promise<Workflow1TemplateResponse> {
   const response = await fetch('/api/workflow-1/templates', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: buildHeaders(options.token),
     body: JSON.stringify(payload),
     cache: 'no-store'
   });
@@ -79,13 +91,12 @@ export async function createWorkflow1Template(payload: Workflow1TemplateRequest)
 
 export async function reanalyzeWorkflow1Template(
   templateId: string,
-  payload: Workflow1ReanalyzeRequest
+  payload: Workflow1ReanalyzeRequest,
+  options: Workflow1RequestOptions = {}
 ): Promise<Workflow1TemplateResponse> {
   const response = await fetch(`/api/workflow-1/templates/${templateId}/reanalyze`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: buildHeaders(options.token),
     body: JSON.stringify(payload),
     cache: 'no-store'
   });

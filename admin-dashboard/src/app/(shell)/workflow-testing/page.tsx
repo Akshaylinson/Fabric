@@ -3,6 +3,7 @@
 import { ChangeEvent, useState } from 'react';
 
 import { Card, Pill, SectionTitle } from '@/components/ui';
+import { useAuthStore } from '@/stores/auth-store';
 import {
   createWorkflow1Template,
   reanalyzeWorkflow1Template,
@@ -71,6 +72,7 @@ function ImageUploadCard({
 }
 
 export default function WorkflowTestingPage() {
+  const token = useAuthStore((state) => state.token);
   const [frontImage, setFrontImage] = useState(createEmptySelection('front_design_ref.png'));
   const [backImage, setBackImage] = useState(createEmptySelection('back_design_ref.png'));
   const [sideImage, setSideImage] = useState(createEmptySelection('side_design_ref.png'));
@@ -149,7 +151,7 @@ export default function WorkflowTestingPage() {
     setStatusMessage('Submitting Workflow 1 template creation request...');
 
     try {
-      const response = await createWorkflow1Template(payload);
+      const response = await createWorkflow1Template(payload, { token });
       setResult(response);
       setSelectedView('package');
       setStatusMessage(`Template ${response.template_id} created with analysis version ${response.analysis_version}.`);
@@ -173,7 +175,7 @@ export default function WorkflowTestingPage() {
     setStatusMessage(`Re-running analysis for ${result.template_id}...`);
 
     try {
-      const response = await reanalyzeWorkflow1Template(result.template_id, { reason: rerunReason.trim() || 'Manual QA rerun' });
+      const response = await reanalyzeWorkflow1Template(result.template_id, { reason: rerunReason.trim() || 'Manual QA rerun' }, { token });
       setResult(response);
       setSelectedView('package');
       setStatusMessage(`Template ${response.template_id} re-analyzed at version ${response.analysis_version}.`);
@@ -433,4 +435,5 @@ export default function WorkflowTestingPage() {
     </div>
   );
 }
+
 

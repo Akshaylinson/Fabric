@@ -1,12 +1,13 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 import { getBaseUrl } from '@/services/api';
 
 const templateServiceBaseUrl = getBaseUrl('template');
 
-function ensureSession() {
-  return cookies().get('admin_session')?.value;
+function getBearerToken(request: Request) {
+  const authorization = request.headers.get('authorization');
+  const [scheme, token] = authorization?.split(' ') ?? [];
+  return scheme?.toLowerCase() === 'bearer' && token ? token : null;
 }
 
 async function proxyToTemplateService(path: string, init: RequestInit) {
@@ -24,7 +25,7 @@ async function proxyToTemplateService(path: string, init: RequestInit) {
 }
 
 export async function POST(request: Request) {
-  if (!ensureSession()) {
+  if (!getBearerToken(request)) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
@@ -35,8 +36,8 @@ export async function POST(request: Request) {
   });
 }
 
-export async function GET() {
-  if (!ensureSession()) {
+export async function GET(request: Request) {
+  if (!getBearerToken(request)) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 

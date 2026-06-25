@@ -1,12 +1,17 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 import { getBaseUrl } from '@/services/api';
 
 const templateServiceBaseUrl = getBaseUrl('template');
 
+function getBearerToken(request: Request) {
+  const authorization = request.headers.get('authorization');
+  const [scheme, token] = authorization?.split(' ') ?? [];
+  return scheme?.toLowerCase() === 'bearer' && token ? token : null;
+}
+
 export async function POST(request: Request, { params }: { params: { templateId: string } }) {
-  if (!cookies().get('admin_session')?.value) {
+  if (!getBearerToken(request)) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
