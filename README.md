@@ -9,7 +9,7 @@ Production-grade monorepo scaffold for an AI-powered textile visualization platf
 - `business-service`: NestJS business domain APIs
 - `orchestrator-service`: FastAPI orchestration and job tracking
 - `template-service`: FastAPI garment template creation
-- `fabric-service`: FastAPI fabric mapping and rendering
+- `fabric-service`: FastAPI fabric mapping and OpenRouter FLUX rendering
 - `tryon-service`: FastAPI virtual try-on rendering
 - `admin-dashboard`: Next.js internal admin and QA dashboard
 
@@ -34,7 +34,6 @@ docker compose up --build
 
 ## Notes
 
-- AI integrations are mocked behind adapter interfaces.
+- AI integrations are service-backed and configured through environment variables.
 - Services communicate over REST and Redis-backed async workflows.
 - Each service includes a health route and OpenAPI docs.
-

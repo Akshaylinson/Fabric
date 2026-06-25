@@ -1,4 +1,4 @@
-﻿export type Workflow2ImageSelection = {
+export type Workflow2ImageSelection = {
   ref: string;
   preview: string;
   fileName: string;
@@ -26,19 +26,36 @@ export type Workflow2TemplateSummary = {
   updated_at: string;
   analysis_version: number;
 };
+
 export type Workflow2RenderResponse = {
   render_id: string;
   render_label: string;
   status: string;
   template_ref: string;
   fabric_ref: string;
+  rendered_image_url: string;
   rendered_image_ref: string;
+  provider: string;
+  model: string;
   version_label: string;
+  reference_count: number;
+  references?: Array<{
+    label: string;
+    source_ref: string;
+  }>;
   metadata: {
-    preserved_structure: boolean;
-    fabric_fit: string;
-    texture_strategy: string;
-    garment_area_covered: string;
+    provider: string;
+    model: string;
+    output_format: string;
+    references_used: number;
+    reference_labels: string[];
+    fabric_source_ref: string;
+    template_preview_ref: string | null;
+    quality_profile: string;
+    image_size: {
+      width: number;
+      height: number;
+    };
     [key: string]: unknown;
   };
   comparison: {

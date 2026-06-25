@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 
@@ -167,7 +167,7 @@ export function Workflow2Console() {
     }
   }
 
-  const renderImageUrl = result ? `/api/workflow-2/renders/${result.render_id}/image` : null;
+  const renderImageUrl = result?.rendered_image_url ?? (result ? `/api/workflow-2/renders/${result.render_id}/image` : null);
 
   return (
     <Card className="space-y-6">
@@ -175,7 +175,7 @@ export function Workflow2Console() {
         <SectionTitle
           eyebrow="Testing Console"
           title="Workflow 2 - Fabric Mapping"
-          description="Select a live template, upload fabric, generate a render, compare versions, and inspect the full mock payloads and logs."
+          description="Select a live template, upload fabric, generate an OpenRouter FLUX render, compare versions, and inspect the full payloads and logs."
         />
         <div className="flex flex-wrap gap-2">
           <Pill tone={result ? 'success' : 'neutral'}>{result ? 'Render ready' : 'Awaiting render'}</Pill>
@@ -189,7 +189,7 @@ export function Workflow2Console() {
           <div className="flex items-center justify-between gap-4">
             <div>
               <h3 className="text-xl font-semibold text-white">Input Capture</h3>
-              <p className="mt-1 text-sm text-slate-300">Stage the fabric and template used by the fabric service.</p>
+              <p className="mt-1 text-sm text-slate-300">Stage the fabric and template used by the OpenRouter-backed fabric service.</p>
             </div>
             <Pill tone="neutral">Workflow 2</Pill>
           </div>
@@ -268,7 +268,7 @@ export function Workflow2Console() {
           <div className="flex items-center justify-between gap-4">
             <div>
               <h3 className="text-xl font-semibold text-white">Live Output</h3>
-              <p className="mt-1 text-sm text-slate-300">Inspect the render response and version comparison details returned by the fabric service.</p>
+              <p className="mt-1 text-sm text-slate-300">Inspect the FLUX render response and version comparison details returned by the fabric service.</p>
             </div>
             <Pill tone={result ? 'success' : 'neutral'}>{result ? result.version_label : 'No result yet'}</Pill>
           </div>
@@ -343,7 +343,7 @@ export function Workflow2Console() {
         <Card className="space-y-4">
           <div>
             <h3 className="text-lg font-semibold text-white">Raw API Response</h3>
-            <p className="mt-1 text-sm text-slate-300">The mock render response returned by the backend, including logs, timing, and version history.</p>
+            <p className="mt-1 text-sm text-slate-300">The render response returned by the backend, including logs, timing, and version history.</p>
           </div>
           <pre className="max-h-[28rem] overflow-auto rounded-2xl border border-white/10 bg-slate-950/70 p-4 text-xs leading-6 text-slate-200">
             {result ? formatJson(result) : 'No response available yet.'}
@@ -391,3 +391,4 @@ export function Workflow2Console() {
     </Card>
   );
 }
+

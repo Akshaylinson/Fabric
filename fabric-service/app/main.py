@@ -3,10 +3,9 @@ from fastapi import FastAPI
 from app.routes import router
 
 app = FastAPI(
-    title="Textile AI Fabric Service",
-    description="Fabric transfer and texture mapping for garment templates",
-    version="1.0.0",
+    title='Textile AI Fabric Service',
+    description='OpenRouter FLUX garment rendering service for Workflow 2',
+    version='2.0.0',
 )
 
 app.include_router(router)
-
