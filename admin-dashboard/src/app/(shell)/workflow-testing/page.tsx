@@ -1,9 +1,10 @@
-'use client';
+﻿'use client';
 
 import { ChangeEvent, useState } from 'react';
 
 import { Card, Pill, SectionTitle } from '@/components/ui';
 import { useAuthStore } from '@/stores/auth-store';
+import { Workflow2Console } from '@/components/workflow2-console';
 import {
   createWorkflow1Template,
   reanalyzeWorkflow1Template,
@@ -432,8 +433,7 @@ export default function WorkflowTestingPage() {
           {!result ? <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 p-4 text-sm text-slate-400">Logs will appear once a template is created.</div> : null}
         </div>
       </Card>
+      <Workflow2Console />
     </div>
   );
 }
-
-
