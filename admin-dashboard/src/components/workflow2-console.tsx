@@ -281,7 +281,7 @@ export function Workflow2Console() {
                   <img
                     src={renderImageUrl}
                     alt={result?.render_label || 'Workflow 2 generated garment'}
-                    className="h-full w-full rounded-xl object-contain"
+                    className="h-full w-full rounded-xl object-cover"
                   />
                 ) : (
                   <div className="space-y-2 text-center">

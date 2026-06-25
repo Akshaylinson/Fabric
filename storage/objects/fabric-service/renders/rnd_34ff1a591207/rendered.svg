@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1600" viewBox="0 0 1200 1600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#eff6ff" />
+    </linearGradient>
+    <linearGradient id="fabricGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ab4243" stop-opacity="1" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.28" />
+    </linearGradient>
+    <pattern id="fabricPattern" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M0 28 L28 0" stroke="#ffffff" stroke-opacity="0.12" stroke-width="4" />
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bg)" />
+  <circle cx="980" cy="180" r="220" fill="#ab4243" fill-opacity="0.14" />
+  <circle cx="170" cy="1380" r="260" fill="#0f172a" fill-opacity="0.05" />
+  <rect x="88" y="88" width="1024" height="1424" rx="44" fill="url(#panel)" stroke="#cbd5e1" stroke-width="2" />
+  <rect x="132" y="132" width="286" height="78" rx="22" fill="#ab4243" />
+  <text x="175" y="184" fill="#ffffff" font-size="30" font-family="Arial, sans-serif" font-weight="700">Workflow 2 Render</text>
+  <text x="900" y="183" text-anchor="end" fill="#334155" font-size="22" font-family="Arial, sans-serif">Workflow 2 - Fabric Render</text>
+
+  <text x="132" y="292" fill="#334155" font-size="22" font-family="Arial, sans-serif">Template</text>
+  <text x="132" y="326" fill="#0f172a" font-size="34" font-family="Arial, sans-serif" font-weight="700">Korean Shell Line</text>
+  <text x="132" y="382" fill="#64748b" font-size="22" font-family="Arial, sans-serif">Fabric ref: download.jpg</text>
+  <text x="132" y="418" fill="#64748b" font-size="22" font-family="Arial, sans-serif">Render time: 145.34 ms</text>
+
+  <rect x="132" y="476" width="936" height="700" rx="36" fill="#ffffff" stroke="#dbeafe" stroke-width="2" />
+  <rect x="192" y="536" width="816" height="580" rx="32" fill="#ab4243" fill-opacity="0.14" stroke="#ab4243" stroke-width="4" />
+  <rect x="228" y="572" width="744" height="508" rx="26" fill="url(#fabricGlow)" />
+  <rect x="228" y="572" width="744" height="508" rx="26" fill="url(#fabricPattern)" />
+  <path d="M405 642 C440 604, 760 604, 795 642 L850 730 L820 1118 C792 1155, 408 1155, 380 1118 L350 730 Z" fill="#ab4243" stroke="#0f172a" stroke-opacity="0.15" stroke-width="6" />
+  <path d="M520 640 L600 725 L680 640" fill="none" stroke="#ffffff" stroke-opacity="0.65" stroke-width="8" stroke-linecap="round" />
+  <path d="M600 725 L600 1140" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="4" stroke-linecap="round" />
+  <rect x="552" y="766" width="96" height="240" rx="24" fill="#ffffff" fill-opacity="0.12" />
+  <rect x="260" y="790" width="86" height="202" rx="24" fill="#ffffff" fill-opacity="0.12" />
+  <rect x="854" y="790" width="86" height="202" rx="24" fill="#ffffff" fill-opacity="0.12" />
+  <circle cx="600" cy="823" r="28" fill="#ffffff" fill-opacity="0.6" />
+  <circle cx="600" cy="888" r="28" fill="#ffffff" fill-opacity="0.6" />
+  <circle cx="600" cy="953" r="28" fill="#ffffff" fill-opacity="0.6" />
+
+  <rect x="132" y="1242" width="296" height="166" rx="28" fill="#0f172a" fill-opacity="0.04" />
+  <rect x="154" y="1268" width="84" height="84" rx="20" fill="#ab4243" />
+  <text x="258" y="1296" fill="#334155" font-size="20" font-family="Arial, sans-serif">Fabric swatch</text>
+  <text x="258" y="1332" fill="#0f172a" font-size="28" font-family="Arial, sans-serif" font-weight="700">#ab4243</text>
+  <text x="258" y="1368" fill="#64748b" font-size="18" font-family="Arial, sans-serif">Mapped from the uploaded image</text>
+
+  <rect x="470" y="1242" width="598" height="166" rx="28" fill="#0f172a" fill-opacity="0.04" />
+  <text x="500" y="1290" fill="#334155" font-size="20" font-family="Arial, sans-serif">Structure preserved</text>
+  <text x="500" y="1332" fill="#0f172a" font-size="28" font-family="Arial, sans-serif" font-weight="700">tpl_5861bf672b6c_download.jpg.png</text>
+  <text x="500" y="1368" fill="#64748b" font-size="18" font-family="Arial, sans-serif">Garment silhouette stays fixed while fabric appearance changes</text>
+</svg>

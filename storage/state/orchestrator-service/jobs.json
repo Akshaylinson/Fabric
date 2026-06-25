@@ -16,6 +16,23 @@
     "updated_at": "2026-06-25T10:24:20.942276+00:00",
     "workflow": "workflow-2"
   },
+  "job_bdc2b81483e4": {
+    "action": "render-fabric",
+    "child_job_ids": [],
+    "created_at": "2026-06-25T10:52:09.571554+00:00",
+    "entity_id": "rnd_34ff1a591207",
+    "job_id": "job_bdc2b81483e4",
+    "parent_job_id": null,
+    "payload": {
+      "fabric_ref": "download.jpg",
+      "render_id": "rnd_34ff1a591207",
+      "template_ref": "tpl_5861bf672b6c"
+    },
+    "retry_count": 0,
+    "status": "completed",
+    "updated_at": "2026-06-25T10:52:09.571554+00:00",
+    "workflow": "workflow-2"
+  },
   "job_d0c543679f3a": {
     "action": "create-template",
     "child_job_ids": [],
