@@ -1,14 +1,24 @@
 'use client';
 
-import { Bell, MoonStar, Search, Menu } from 'lucide-react';
+import { Bell, LogOut, MoonStar, Search, Menu } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useUiStore } from '@/stores/ui-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { Pill } from '@/components/ui';
 
 export function Topbar() {
+  const router = useRouter();
   const toggleSidebar = useUiStore((state) => state.toggleSidebar);
   const toggleTheme = useUiStore((state) => state.toggleTheme);
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+
+  async function handleLogout() {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    logout();
+    router.replace('/login');
+    router.refresh();
+  }
 
   return (
     <header className="flex items-center gap-3 border-b border-white/10 bg-slate-950/60 px-4 py-4 backdrop-blur xl:px-6">
@@ -38,7 +48,14 @@ export function Topbar() {
         </div>
         <Pill tone="success">Online</Pill>
       </div>
+      <button
+        className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-200 transition hover:bg-white/10"
+        onClick={() => void handleLogout()}
+        aria-label="Logout"
+      >
+        <LogOut className="h-4 w-4" />
+        Logout
+      </button>
     </header>
   );
 }
-
