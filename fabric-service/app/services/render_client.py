@@ -55,7 +55,7 @@ class GenericRenderAdapter:
       openrouter, gemini, flux, together, replicate, stability, or any
       OpenAI-compatible image generation endpoint.
 
-    When provider == 'openrouter', the optional HTTP-Referer / X-Title
+    When provider == 'openrouter', the optional HTTP-Referer / X-OpenRouter-Title
     headers are added automatically.
     """
 
@@ -85,12 +85,21 @@ class GenericRenderAdapter:
             if self._cfg.referer:
                 headers["HTTP-Referer"] = self._cfg.referer
             if self._cfg.title:
-                headers["X-Title"] = self._cfg.title
+                headers["X-OpenRouter-Title"] = self._cfg.title
+
+        input_references: list[Any]
+        if self._cfg.provider.lower() == "openrouter":
+            input_references = [
+                {"type": "image_url", "image_url": {"url": reference}}
+                for reference in references[: self._settings.RENDER_MAX_REFERENCES]
+            ]
+        else:
+            input_references = references[: self._settings.RENDER_MAX_REFERENCES]
 
         payload: dict[str, Any] = {
             "model": self._cfg.model,
             "prompt": prompt,
-            "input_references": references[: self._settings.RENDER_MAX_REFERENCES],
+            "input_references": input_references,
             "output_format": self._settings.RENDER_OUTPUT_FORMAT,
             "n": self._settings.RENDER_IMAGE_COUNT,
         }
@@ -160,3 +169,5 @@ def build_secondary_client(settings: Settings | None = None) -> RenderClientProt
         timeout=s.SECONDARY_RENDER_TIMEOUT,
     )
     return GenericRenderAdapter(cfg, s)
+
+
