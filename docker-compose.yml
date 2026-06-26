@@ -1,4 +1,4 @@
-﻿services:
+services:
   postgres:
     image: postgres:16-alpine
     environment:
@@ -46,7 +46,8 @@
       PORT: ${GATEWAY_PORT}
       AUTH_SERVICE_URL: http://auth-service:${AUTH_SERVICE_PORT}
       BUSINESS_SERVICE_URL: http://business-service:${BUSINESS_SERVICE_PORT}
-      ORCHESTRATOR_SERVICE_URL: http://orchestrator-service:${ORCHESTRATOR_SERVICE_PORT}`r`n    ports:
+      ORCHESTRATOR_SERVICE_URL: http://orchestrator-service:${ORCHESTRATOR_SERVICE_PORT}
+    ports:
       - "3000:3000"
     depends_on:
       postgres:
@@ -115,7 +116,8 @@
       MINIO_ENDPOINT: ${MINIO_ENDPOINT}
       REDIS_URL: ${REDIS_URL}
       TEXTILE_STORAGE_ROOT: /data
-      ORCHESTRATOR_SERVICE_URL: http://orchestrator-service:${ORCHESTRATOR_SERVICE_PORT}`r`n    ports:
+      ORCHESTRATOR_SERVICE_URL: http://orchestrator-service:${ORCHESTRATOR_SERVICE_PORT}
+    ports:
       - "8001:8001"
     volumes:
       - ./storage:/data
@@ -135,7 +137,8 @@
       MINIO_ENDPOINT: ${MINIO_ENDPOINT}
       TEXTILE_STORAGE_ROOT: /data
       TEMPLATE_SERVICE_URL: http://template-service:${TEMPLATE_SERVICE_PORT}
-      ORCHESTRATOR_SERVICE_URL: http://orchestrator-service:${ORCHESTRATOR_SERVICE_PORT}`r`n    ports:
+      ORCHESTRATOR_SERVICE_URL: http://orchestrator-service:${ORCHESTRATOR_SERVICE_PORT}
+    ports:
       - "8002:8002"
     volumes:
       - ./storage:/data
@@ -154,7 +157,8 @@
       PORT: ${TRYON_SERVICE_PORT}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT}
       TEXTILE_STORAGE_ROOT: /data
-      ORCHESTRATOR_SERVICE_URL: http://orchestrator-service:${ORCHESTRATOR_SERVICE_PORT}`r`n    ports:
+      ORCHESTRATOR_SERVICE_URL: http://orchestrator-service:${ORCHESTRATOR_SERVICE_PORT}
+    ports:
       - "8003:8003"
     volumes:
       - ./storage:/data
@@ -183,6 +187,7 @@
       - template-service
       - fabric-service
       - tryon-service
+
   prometheus:
     image: prom/prometheus:latest
     volumes:
@@ -202,8 +207,3 @@ volumes:
   postgres_data:
   redis_data:
   minio_data:
-
-
-
-
-
