@@ -81,32 +81,68 @@ class GenericRenderAdapter:
             "Authorization": f"Bearer {self._cfg.api_key}",
             "Content-Type": "application/json",
         }
-        if self._cfg.provider.lower() == "openrouter":
+
+        provider = self._cfg.provider.lower()
+
+        if provider == "huggingface":
+            # HuggingFace free Inference API: POST inputs as JSON, response is raw image bytes
+            headers["Accept"] = "image/png"
+            payload: dict[str, Any] = {
+                "inputs": prompt,
+                "parameters": {
+                    "width": self._settings.RENDER_IMAGE_WIDTH,
+                    "height": self._settings.RENDER_IMAGE_HEIGHT,
+                },
+            }
+            if self._settings.RENDER_USE_SEED:
+                payload["parameters"]["seed"] = self._settings.RENDER_SEED
+        elif provider == "openrouter":
+            # OpenRouter expects input_references as objects, not plain strings
+            payload = {
+                "model": self._cfg.model,
+                "prompt": prompt,
+                "input_references": [
+                    {"type": "image_url", "image_url": {"url": ref}}
+                    for ref in references[: self._settings.RENDER_MAX_REFERENCES]
+                ],
+                "output_format": self._settings.RENDER_OUTPUT_FORMAT,
+                "n": self._settings.RENDER_IMAGE_COUNT,
+            }
+            if self._settings.RENDER_USE_SEED:
+                payload["seed"] = self._settings.RENDER_SEED
             if self._cfg.referer:
                 headers["HTTP-Referer"] = self._cfg.referer
             if self._cfg.title:
-                headers["X-OpenRouter-Title"] = self._cfg.title
-
-        input_references: list[Any]
-        if self._cfg.provider.lower() == "openrouter":
-            input_references = [
-                {"type": "image_url", "image_url": {"url": reference}}
-                for reference in references[: self._settings.RENDER_MAX_REFERENCES]
-            ]
+                headers["X-Title"] = self._cfg.title
         else:
-            input_references = references[: self._settings.RENDER_MAX_REFERENCES]
-
-        payload: dict[str, Any] = {
-            "model": self._cfg.model,
-            "prompt": prompt,
-            "input_references": input_references,
-            "output_format": self._settings.RENDER_OUTPUT_FORMAT,
-            "n": self._settings.RENDER_IMAGE_COUNT,
-        }
-        if self._settings.RENDER_USE_SEED:
-            payload["seed"] = self._settings.RENDER_SEED
+            payload = {
+                "model": self._cfg.model,
+                "prompt": prompt,
+                "input_references": references[: self._settings.RENDER_MAX_REFERENCES],
+                "output_format": self._settings.RENDER_OUTPUT_FORMAT,
+                "n": self._settings.RENDER_IMAGE_COUNT,
+            }
+            if self._settings.RENDER_USE_SEED:
+                payload["seed"] = self._settings.RENDER_SEED
 
         return _post_with_retry(url, headers, payload, self._cfg.timeout, self._cfg.provider)
+
+
+def _parse_response(response: requests.Response, provider: str) -> dict[str, Any]:
+    """Return a normalised dict regardless of whether the provider returns
+    JSON or raw image bytes (e.g. HuggingFace Inference Router)."""
+    content_type = response.headers.get("Content-Type", "")
+    if any(ct in content_type for ct in ("image/", "application/octet-stream")):
+        import base64
+        b64 = base64.b64encode(response.content).decode("ascii")
+        return {"data": [{"b64_json": b64}]}
+    try:
+        return response.json()
+    except ValueError:
+        # Last resort: treat body as raw image bytes
+        import base64
+        b64 = base64.b64encode(response.content).decode("ascii")
+        return {"data": [{"b64_json": b64}]}
 
 
 def _post_with_retry(
@@ -127,8 +163,8 @@ def _post_with_retry(
                     status_code=response.status_code,
                     provider=provider,
                 )
-            return response.json()
-        except (requests.RequestException, ValueError) as exc:
+            return _parse_response(response, provider)
+        except (requests.RequestException,) as exc:
             last_error = str(exc)
             if attempt == max_attempts - 1:
                 raise RenderClientError(last_error, provider=provider) from exc
