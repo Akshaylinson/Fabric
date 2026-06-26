@@ -13,9 +13,9 @@ from PIL import Image
 
 from app.services.config import get_settings
 from app.services.image_decoder import decode_and_save
-from app.services.openrouter_client import OpenRouterClient
 from app.services.prompt_builder import build_prompt
-from app.services.reference_builder import build_reference_manifest, build_references
+from app.services.reference_builder import build_reference_manifest
+from app.services.render_client import RenderClientError, build_primary_client, build_secondary_client
 from textile_shared.persistence import LocalObjectStorage, service_object_dir
 
 
@@ -40,11 +40,11 @@ class Workflow2AIService:
     def __init__(
         self,
         storage: LocalObjectStorage | None = None,
-        client: OpenRouterClient | None = None,
     ) -> None:
         self.settings = get_settings()
         self.storage = storage or LocalObjectStorage(service_object_dir("fabric-service"))
-        self.client = client or OpenRouterClient(self.settings)
+        self._primary = build_primary_client(self.settings)
+        self._secondary = build_secondary_client(self.settings)
 
     def _fabric_extension(self, fabric_bytes: bytes, fabric_mime_type: str | None) -> str:
         if fabric_mime_type:
@@ -124,13 +124,8 @@ class Workflow2AIService:
             }
         )
 
-        response_json = self.client.generate_image(prompt, references)
-        processing_logs.append(
-            {
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "stage": "openrouter-response",
-                "message": "OpenRouter returned an image payload.",
-            }
+        response_json, active_provider, active_model = self._generate_with_fallback(
+            prompt, references, render_id, processing_logs, started_at
         )
 
         final_path = decode_and_save(response_json, self.storage.path_for(f"renders/{render_id}/final.png"))
@@ -140,8 +135,8 @@ class Workflow2AIService:
 
         completed_at = datetime.now(timezone.utc)
         processing_time_ms = round((perf_counter() - timer_started) * 1000, 2)
-        provider = "openrouter"
-        model = self.settings.OPENROUTER_MODEL
+        provider = active_provider
+        model = active_model
         fabric_color_hint = self._fabric_color_hint(fabric_bytes)
 
         metadata: dict[str, Any] = {
@@ -168,7 +163,7 @@ class Workflow2AIService:
             "image_height": self.settings.RENDER_IMAGE_HEIGHT,
             "preserved_structure": True,
             "fabric_fit": "applied",
-            "texture_strategy": "openrouter_flux_ai",
+            "texture_strategy": "ai_render",
             "garment_area_covered": "template-guided",
         }
 
@@ -187,7 +182,7 @@ class Workflow2AIService:
         }
 
         image_url = f"/renders/{render_id}/image"
-        notes = "OpenRouter FLUX render completed successfully."
+        notes = f"Render completed via {provider} ({model})."
 
         package = {
             "render_id": render_id,
@@ -231,4 +226,64 @@ class Workflow2AIService:
             ],
             response_json=response_json,
         )
+
+    def _generate_with_fallback(
+        self,
+        prompt: str,
+        references: list[str],
+        render_id: str,
+        processing_logs: list[dict[str, str]],
+        started_at: datetime,
+    ) -> tuple[dict[str, Any], str, str]:
+        primary_model = self.settings.PRIMARY_RENDER_MODEL
+
+        try:
+            processing_logs.append({
+                "timestamp": started_at.isoformat(),
+                "stage": "ai-request",
+                "message": f"Submitting render to primary provider '{self._primary.provider_name}' model '{primary_model}'.",
+            })
+            response_json = self._primary.generate_image(prompt, references)
+            processing_logs.append({
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "stage": "ai-response",
+                "message": f"Primary provider '{self._primary.provider_name}' returned image payload.",
+            })
+            return response_json, self._primary.provider_name, primary_model
+
+        except RenderClientError as primary_exc:
+            processing_logs.append({
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "stage": "primary-failed",
+                "message": f"Primary provider failed: {primary_exc}. Attempting fallback.",
+            })
+
+            if not self._secondary:
+                raise
+
+            secondary_model = self.settings.SECONDARY_RENDER_MODEL
+            try:
+                processing_logs.append({
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "stage": "fallback-request",
+                    "message": f"Submitting render to secondary provider '{self._secondary.provider_name}' model '{secondary_model}'.",
+                })
+                response_json = self._secondary.generate_image(prompt, references)
+                processing_logs.append({
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "stage": "fallback-response",
+                    "message": f"Secondary provider '{self._secondary.provider_name}' returned image payload.",
+                })
+                return response_json, self._secondary.provider_name, secondary_model
+
+            except RenderClientError as secondary_exc:
+                processing_logs.append({
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "stage": "fallback-failed",
+                    "message": f"Secondary provider also failed: {secondary_exc}.",
+                })
+                raise RenderClientError(
+                    f"Both primary ('{self._primary.provider_name}') and secondary ('{self._secondary.provider_name}') providers failed. "
+                    f"Primary: {primary_exc}. Secondary: {secondary_exc}."
+                ) from secondary_exc
 

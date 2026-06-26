@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
+from app.services.render_client import RenderClientError
 from app.services.workflow2_ai_service import Workflow2AIService
 from textile_shared.persistence import (
     LocalObjectStorage,
@@ -55,13 +56,16 @@ def render_fabric(request: FabricRenderRequest) -> dict[str, Any]:
 
     template_package = _load_template_package(request.template_ref)
 
-    result = _WORKFLOW2.render(
-        template_package=template_package,
-        fabric_ref=request.fabric_ref,
-        fabric_bytes=fabric_bytes,
-        fabric_mime_type=fabric_mime_type,
-        render_label=request.render_label,
-    )
+    try:
+        result = _WORKFLOW2.render(
+            template_package=template_package,
+            fabric_ref=request.fabric_ref,
+            fabric_bytes=fabric_bytes,
+            fabric_mime_type=fabric_mime_type,
+            render_label=request.render_label,
+        )
+    except RenderClientError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
 
     payload: dict[str, Any] = {
         'render_id': result.render_id,
