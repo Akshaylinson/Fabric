@@ -39,8 +39,13 @@
 
 - `GET /health`
 - `POST /fabric/render`
+- `GET /renders/{render_id}/image`
 
 ## Try-On Service
 
 - `GET /health`
 - `POST /tryon/render`
+- `GET /tryon/render/{preview_id}`
+- `GET /tryon/render/{preview_id}/image`
+- `GET /tryon/previews`
+- `DELETE /tryon/render/{preview_id}`

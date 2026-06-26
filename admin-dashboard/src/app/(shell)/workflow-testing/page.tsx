@@ -1,10 +1,11 @@
-﻿'use client';
+'use client';
 
 import { ChangeEvent, useState } from 'react';
 
 import { Card, Pill, SectionTitle } from '@/components/ui';
 import { useAuthStore } from '@/stores/auth-store';
 import { Workflow2Console } from '@/components/workflow2-console';
+import { Workflow3Console } from '@/components/workflow3-console';
 import {
   createWorkflow1Template,
   reanalyzeWorkflow1Template,
@@ -437,6 +438,7 @@ export default function WorkflowTestingPage() {
         </div>
       </Card>
       <Workflow2Console />
+      <Workflow3Console />
     </div>
   );
 }

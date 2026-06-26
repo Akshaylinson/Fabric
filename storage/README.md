@@ -8,4 +8,4 @@ MinIO object keys used by the platform:
 - `templates/{template_id}/masks/*`
 - `outputs/fabric/{job_id}/*`
 - `outputs/tryon/{job_id}/*`
-
+- `previews/{preview_id}/*`

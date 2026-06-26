@@ -10,7 +10,7 @@ Production-grade monorepo scaffold for an AI-powered textile visualization platf
 - `orchestrator-service`: FastAPI orchestration and job tracking
 - `template-service`: FastAPI garment template creation
 - `fabric-service`: FastAPI fabric mapping and OpenRouter FLUX rendering
-- `tryon-service`: FastAPI virtual try-on rendering
+- `tryon-service`: FastAPI API-driven workflow 3 virtual try-on rendering
 - `admin-dashboard`: Next.js internal admin and QA dashboard
 
 ## Run
@@ -35,5 +35,6 @@ docker compose up --build
 ## Notes
 
 - AI integrations are service-backed and configured through environment variables.
+- Workflow 3 now uses the API-driven try-on service instead of a local VTON model stack.
 - Services communicate over REST and Redis-backed async workflows.
 - Each service includes a health route and OpenAPI docs.
